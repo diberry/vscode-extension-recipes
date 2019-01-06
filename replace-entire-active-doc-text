@@ -1,0 +1,49 @@
+// executed with command from command palette
+
+export function activate(context: vscode.ExtensionContext) {
+
+    // The command has been defined in the package.json file
+    // Now provide the implementation of the command with  registerCommand
+    // The commandId parameter must match the command field in package.json
+    let disposable = vscode.commands.registerCommand('extension.mycommand', () => {
+
+      // The code you place here will be executed every time your command is executed
+      let activeEditor = vscode.window.activeTextEditor;
+
+      if (!activeEditor) {
+          return;
+      }
+      let doc = activeEditor.document;
+      
+      let currentText = doc.getText();
+      
+      // pass doc in case you need other information in the transform
+      // such as where the file is located and if it is dirty
+      let finalText = yourTransformFunction(doc, currentText);
+      
+      activeEditor.edit(editBuilder => {
+
+          // get range of text to replace - in this case the entire file
+          // line 0, position 0, 
+          // last line, last position
+          let range = new vscode.Range(new vscode.Position(0,0),doc.lineAt(doc.lineCount-1).range.end);
+          
+          // replace text
+          editBuilder.replace(range, finalText);
+
+          // show window at bottom right of editor 
+          vscode.window.showInformationMessage("File contents have been replaced");
+
+          });
+      }).catch((err) => {
+
+
+    });
+
+    context.subscriptions.push(disposable);
+}
+
+// this method is called when your extension is deactivated
+export function deactivate() {
+    console.log("deactivate");
+}
